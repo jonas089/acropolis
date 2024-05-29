@@ -1,3 +1,10 @@
+# Tornado.gov - Protocol mprovement proposal
+In order to hide the votes from the government, we need to nullify identities anonymously when voting.
+
+This could potentially be achieved by adding government issued identities as leafs in a Merkle Tree, where the leaf is a private input to the circuit when voting.
+
+To prevent double-voting (=double-spending) one must ensure that each nullifier can only be used once without leaking additional information about the identity.
+
 # Acropolis - a ZKVM enabled voting mechanism
 
 ![Demo with TUI and Ethereum Audit](https://github.com/cspr-rad/acropolis/blob/main/resources/demo-video.gif)
