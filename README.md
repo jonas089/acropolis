@@ -1,4 +1,4 @@
-# Tornado.gov - Protocol mprovement proposal
+# Tornado.gov - Protocol improvement proposal
 In order to hide the votes from the government, we need to nullify identities anonymously when voting.
 
 This could potentially be achieved by adding government issued identities as leafs in a Merkle Tree, where the leaf is a private input to the circuit when voting.
