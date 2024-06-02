@@ -1,9 +1,11 @@
 # Tornado.gov - Protocol improvement proposal
-In order to hide the votes from the government, we need to nullify identities anonymously when voting.
+- User submits hash of nullifier alongside KYC
+- hash of nullifier is included in Merkle Tree on-chain
+- nullifier can be used to vote anonymously
+- nullifier hash is created using a random seed that will never be revealed and the nullifier itself
+- nullifiers that have been used are stored in the contract
 
-This could potentially be achieved by adding government issued identities as leafs in a Merkle Tree, where the leaf is a private input to the circuit when voting.
-
-To prevent double-voting (=double-spending) one must ensure that each nullifier can only be used once without leaking additional information about the identity.
+It is not necessary to store the entire root history, since we can use our merkle proof for our nullifier hash to prove the inclusion for one merkle root and prove that it leads up to the current merkle root. This is an optimization that is done in Tornadocash.
 
 # Acropolis - a ZKVM enabled voting mechanism
 
