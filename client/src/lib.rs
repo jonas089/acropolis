@@ -107,7 +107,12 @@ pub fn run(cli: Cli) {
 
             #[cfg(feature = "groth16")]
             if let Some(groth16_receipt_out_path) = groth16_receipt_out_path {
-                let groth16_receipt = prover::prove_groth16(receipt);
+                let groth16_receipt = prover::prove_groth16(
+                    &vote,
+                    &user_secret_key,
+                    &government_public_key,
+                    &public_identity,
+                );
                 fs::write(
                     groth16_receipt_out_path,
                     format!(

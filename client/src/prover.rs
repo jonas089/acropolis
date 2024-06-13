@@ -41,12 +41,48 @@ pub fn prove(
 }
 
 #[cfg(feature = "groth16")]
-pub fn prove_groth16(receipt: Receipt) -> Receipt {
+pub fn prove_groth16(
+    choice: &str,
+    user_secret_key: &SigningKey,
+    government_public_key: &VerifyingKey,
+    public_identity: &Signature,
+) -> Receipt {
     use risc0_groth16::docker::stark_to_snark;
     use risc0_zkvm::{
-        get_prover_server, recursion::identity_p254, CompactReceipt, InnerReceipt, ProverOpts,
-        Receipt,
+        get_prover_server, recursion::identity_p254, CompactReceipt, ExecutorImpl, InnerReceipt,
+        ProverOpts, Receipt, VerifierContext,
     };
+
+    let user_public_key_serialized: Vec<u8> = user_secret_key
+        .verifying_key()
+        .clone()
+        .to_encoded_point(true)
+        .to_bytes()
+        .to_vec();
+    let government_public_key_serialized: Vec<u8> = government_public_key
+        .to_encoded_point(true)
+        .to_bytes()
+        .to_vec();
+    let unique_session_signature: Signature = user_secret_key.sign(choice.as_bytes());
+    let circuit_inputs: CircuitInputs = CircuitInputs {
+        choice: choice.to_string(),
+        user_public_key: user_public_key_serialized,
+        session_signature: unique_session_signature,
+        government_public_key: government_public_key_serialized,
+        public_identity: *public_identity,
+    };
+    let env = ExecutorEnv::builder()
+        .write(&circuit_inputs)
+        .unwrap()
+        .build()
+        .unwrap();
+    let mut exec = ExecutorImpl::from_elf(env, ACROPOLIS_ELF).unwrap();
+    let session = exec.run().unwrap();
+    let opts = ProverOpts::default();
+    let ctx = VerifierContext::default();
+    let prover = get_prover_server(&opts).unwrap();
+    let receipt = prover.prove_session(&ctx, &session).unwrap();
+
     let opts = ProverOpts::default();
     let prover = get_prover_server(&opts).unwrap();
     let claim = receipt.get_claim().unwrap();
@@ -113,13 +149,12 @@ fn optimize_groth16_proof() {
     );
     let public_identity: Signature = government_signing_key.sign(&payload);
     let choice: String = "42".to_string();
-    let receipt = prove(
+    let receipt = prove_groth16(
         &choice,
         &signing_key,
         government_signing_key.verifying_key(),
         &public_identity,
     );
-    let optimized_receipt = prove_groth16(&receipt);
     println!(
         "Optimized Receipt size: {:?}",
         serde_json::to_vec(&optimized_receipt).unwrap().len()

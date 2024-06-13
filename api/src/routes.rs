@@ -86,7 +86,7 @@ async fn fetch_votes(
 }
 
 // Ping endpoint for debugging - TODO return DateTime of API server
-async fn ping() -> &'static str {
+async fn ping() -> impl IntoResponse {
     "Pong!"
 }
 
