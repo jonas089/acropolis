@@ -86,21 +86,19 @@ pub fn run(cli: Cli) {
 
             // generate a regular risc0 proof and submit it to the API server
             #[cfg(not(feature = "groth16"))]
-            let receipt = prover::prove(
-                &vote,
-                &user_secret_key,
-                &government_public_key,
-                &public_identity,
-            );
-
-            #[cfg(not(feature = "groth16"))]
-            if let Some(receipt_out_path) = receipt_out_path {
-                let serialized_receipt = bincode::serialize(&receipt).expect("");
-                fs::write(receipt_out_path, serialized_receipt).expect("");
-            };
-
-            #[cfg(not(feature = "groth16"))]
             {
+                let receipt = prover::prove(
+                    &vote,
+                    &user_secret_key,
+                    &government_public_key,
+                    &public_identity,
+                );
+
+                if let Some(receipt_out_path) = receipt_out_path {
+                    let serialized_receipt = bincode::serialize(&receipt).expect("");
+                    fs::write(receipt_out_path, serialized_receipt).expect("");
+                };
+
                 let client: Client = Client::new();
                 let response = client
                     .post("http://127.0.0.1:8080/submit_receipt")
