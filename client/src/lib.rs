@@ -100,13 +100,15 @@ pub fn run(cli: Cli) {
             };
 
             #[cfg(not(feature = "groth16"))]
-            let client: Client = Client::new();
-            let response = client
-                .post("http://127.0.0.1:8080/submit_receipt")
-                .json(&receipt)
-                .send()
-                .expect("Failed to submit proof to server");
-            assert!(response.status().is_success());
+            {
+                let client: Client = Client::new();
+                let response = client
+                    .post("http://127.0.0.1:8080/submit_receipt")
+                    .json(&receipt)
+                    .send()
+                    .expect("Failed to submit proof to server");
+                assert!(response.status().is_success());
+            }
 
             #[cfg(feature = "groth16")]
             if let Some(groth16_receipt_out_path) = groth16_receipt_out_path {
