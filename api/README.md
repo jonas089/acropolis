@@ -7,7 +7,7 @@ HIERARCHICAL LOADING! In the following order:
 toml -> dotenv -> env variables
 **No need to use one or the other**
 
-**toml**
+**api-config.toml**
 ```
 [server]
 address = "0.0.0.0"
